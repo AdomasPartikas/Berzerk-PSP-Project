@@ -1,8 +1,6 @@
 B/G 255 - Enter Door
 G 255 - Player
-R/G/B 255 - PlayerCore
 R 255 - Enemy
-R/B 255 - EnemyCore
 B 255 - Wall
 R/G 255 - Exit Door
-R/G/B 0 - Space
+R/G/B 0 - Empty (walkable) space

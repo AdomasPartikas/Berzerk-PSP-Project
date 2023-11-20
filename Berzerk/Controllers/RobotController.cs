@@ -49,7 +49,7 @@ namespace Berzerk.Controllers
 
         public void NextMove(int movementSpeed)
         {
-            if (random.Next(0, 100) > 80) // 20% chance for robot to change state
+            if (random.Next(0, 100) > 98) // 1% chance for robot to change state
             {
                 switch (robotMindset)
                 {
@@ -57,7 +57,7 @@ namespace Berzerk.Controllers
                         {
                             var number = random.Next(0, 100);
 
-                            if (number > 90)
+                            if (number > 40)
                                 robotState = RobotState.Moving;
                             else
                                 robotState = RobotState.Attacking;
@@ -67,7 +67,7 @@ namespace Berzerk.Controllers
                         {
                             var number = random.Next(0, 100);
 
-                            if (number > 90)
+                            if (number > 97)
                                 robotState = RobotState.Attacking;
                             else
                                 robotState = RobotState.Moving;
@@ -94,9 +94,9 @@ namespace Berzerk.Controllers
             {
                 case RobotState.Idle:
                     {
-                        if(random.Next(0, 100) > 90)
-                            direction = (Direction)random.Next(0, 8);
-                        MoveRobot(direction, movementSpeed);
+                        //if(random.Next(0, 100) > 90)
+                            //direction = (Direction)random.Next(0, 8);
+                        //MoveRobot(direction, movementSpeed);
                     }
                     break;
                 case RobotState.Attacking:
@@ -128,10 +128,6 @@ namespace Berzerk.Controllers
                             {
                                 direction = listOfDirections.First();
                                 listOfDirections.RemoveAt(0);
-                            }
-                            else
-                            {
-                                direction = (Direction)random.Next(0, 8);
                             }
                         }
                         else

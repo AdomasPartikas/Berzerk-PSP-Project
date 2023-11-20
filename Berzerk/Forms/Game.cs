@@ -30,6 +30,8 @@ namespace Berzerk.Forms
         private int gameSpeed = 10;
         private bool isOttoAlive = false;
 
+        private int roundCount = 0;
+
         Random rand = new Random();
 
 
@@ -53,6 +55,8 @@ namespace Berzerk.Forms
             isOttoAlive = false;
 
             map = new MapControllers(this);
+
+            roundCount++;
 
             GC.Collect();
 
@@ -78,6 +82,7 @@ namespace Berzerk.Forms
                 if (entity.type == MapDTO.EntityType.Robot)
                 {
                     var robotMindset = (CharacterDTO.RobotMindset)rand.Next(0, 3);
+                    robotMindset = CharacterDTO.RobotMindset.Aggressive;
                     var robotState = (CharacterDTO.RobotState)rand.Next(0,2);
                     var robotType = (CharacterDTO.RobotType)rand.Next(0, 2);
 
@@ -172,7 +177,8 @@ namespace Berzerk.Forms
             if(player.isPlayerAlive == false)
             {
                 isGameRunning = false;
-                MessageBox.Show("You died!");
+                MessageBox.Show($"You died! You survived {roundCount} rounds!");
+                roundCount = 0;
                 StartNewRound();
                 return;
             }

@@ -77,8 +77,8 @@ namespace Berzerk.Forms
             {
                 if (entity.type == MapDTO.EntityType.Robot)
                 {
-                    var robotMindset = (CharacterDTO.RobotMindset)rand.Next(0, 4);
-                    var robotState = (CharacterDTO.RobotState)rand.Next(0,3);
+                    var robotMindset = (CharacterDTO.RobotMindset)rand.Next(0, 3);
+                    var robotState = (CharacterDTO.RobotState)rand.Next(0,2);
                     var robotType = (CharacterDTO.RobotType)rand.Next(0, 2);
 
                     MapDTO.robots.Add(new RobotController(entity, robotMindset, robotState, robotType, pathfind, player, gamePanel));

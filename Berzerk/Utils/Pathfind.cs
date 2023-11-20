@@ -46,7 +46,7 @@ namespace Berzerk.Utils
                 throw new NullReferenceException();
             }
         }
-        public List<CharacterDTO.Direction> GetPathFromObjectToTarget(Tuple<int, int> addresser, Tuple<int, int> target, bool ottoMode)
+        public List<CharacterDTO.Direction> GetPathFromObjectToTarget(Tuple<int, int> addresser, Tuple<int, int> target, bool ottoMode, int pathfindIterations)
         {
             if (map == null)
             {

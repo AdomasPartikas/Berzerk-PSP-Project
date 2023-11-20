@@ -23,12 +23,10 @@ namespace Berzerk.DTOs
         {
             Deffensive,
             Aggressive,
-            Random,
             Passive
         };
         public enum RobotState
         {
-            Idle,
             Attacking,
             Moving
         };

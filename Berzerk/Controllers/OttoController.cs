@@ -43,7 +43,7 @@ namespace Berzerk.Controllers
                 var playerCoordinates = new Tuple<int, int>(player.playerBody.Location.X / 10, player.playerBody.Location.Y / 10);
                 var ottoCoordinates = new Tuple<int, int>(ottoBody.Location.X / 10, ottoBody.Location.Y / 10);
 
-                var path = pathfind.GetPathFromObjectToTarget(ottoCoordinates, playerCoordinates, true);
+                var path = pathfind.GetPathFromObjectToTarget(ottoCoordinates, playerCoordinates, true, 15);
 
                 if (path.Count > 0)
                 {

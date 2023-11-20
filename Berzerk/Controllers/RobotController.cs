@@ -57,7 +57,7 @@ namespace Berzerk.Controllers
                         {
                             var number = random.Next(0, 100);
 
-                            if (number > 40)
+                            if (number > 90)
                                 robotState = RobotState.Moving;
                             else
                                 robotState = RobotState.Attacking;
@@ -75,42 +75,35 @@ namespace Berzerk.Controllers
                         break;
                     case RobotMindset.Passive:
                         {
-                            var number = random.Next(0, 100);
-
-                            if (number > 90)
-                                robotState = RobotState.Moving;
-                            else
-                                robotState = RobotState.Idle;
-                        }
-                        break;
-                    case RobotMindset.Random:
-                        {
-                            robotState = (RobotState)random.Next(0, 4);
+                            robotState = RobotState.Moving;
                         }
                         break;
                 }
             }
             switch (robotState)
             {
-                case RobotState.Idle:
-                    {
-                        //if(random.Next(0, 100) > 90)
-                            //direction = (Direction)random.Next(0, 8);
-                        //MoveRobot(direction, movementSpeed);
-                    }
-                    break;
                 case RobotState.Attacking:
                     {
-                        if (player.playerBody != null && robotBody != null)
+                        var pathToPlayer = pathfind.GetPathFromObjectToTarget(new Tuple<int, int>(robotBody.Location.X / 10, robotBody.Location.Y / 10), new Tuple<int, int>(player.playerBody.Location.X / 10, player.playerBody.Location.Y / 10), false, 15);
+                        if (pathToPlayer.Count > 0)
                         {
-                            var pathToPlayer = pathfind.GetPathFromObjectToTarget(new Tuple<int, int>(robotBody.Location.X / 10, robotBody.Location.Y / 10), new Tuple<int, int>(player.playerBody.Location.X / 10, player.playerBody.Location.Y / 10), false);
-                            if (pathToPlayer.Count > 0)
-                                direction = pathToPlayer.First();
-                            else
-                                direction = (Direction)random.Next(0, 8);
+                            listOfDirections = pathToPlayer;
+                            direction = listOfDirections.First();
+                            listOfDirections.RemoveAt(0);
                         }
                         else
-                            direction = (Direction)random.Next(0, 8);
+                        {
+                            if (listOfDirections.Count == 0)
+                            {
+                                listOfDirections = pathfind.GetPathFromObjectToTarget(new Tuple<int, int>(robotBody.Location.X / 10, robotBody.Location.Y / 10), new Tuple<int, int>(random.Next(0, 125), random.Next(0, 70)), false, 30);
+                            }
+
+                            if (listOfDirections.Count > 0)
+                            {
+                                direction = listOfDirections.First();
+                                listOfDirections.RemoveAt(0);
+                            }
+                        }
 
                         MoveRobot(direction, movementSpeed);
                     }
@@ -121,7 +114,7 @@ namespace Berzerk.Controllers
                         {
                             if(listOfDirections.Count == 0)
                             {
-                                listOfDirections = pathfind.GetPathFromObjectToTarget(new Tuple<int, int>(robotBody.Location.X / 10, robotBody.Location.Y / 10), new Tuple<int, int>(random.Next(0, 125), random.Next(0, 70)), false);
+                                listOfDirections = pathfind.GetPathFromObjectToTarget(new Tuple<int, int>(robotBody.Location.X / 10, robotBody.Location.Y / 10), new Tuple<int, int>(random.Next(0, 125), random.Next(0, 70)), false, 100);
                             }
                             
                             if(listOfDirections.Count > 0)

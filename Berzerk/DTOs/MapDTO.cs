@@ -1,4 +1,5 @@
-﻿using Berzerk.Controllers;
+﻿using Berzerk.Abstraction;
+using Berzerk.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Berzerk.DTOs
 {
-    internal class MapDTO
+    public class MapDTO
     {
         public static int MapWidth { get; set;}
         public static int MapHeight { get; set; }
@@ -17,6 +18,11 @@ namespace Berzerk.DTOs
         public static List<RobotController> robots = new List<RobotController>();
 
         public static List<BulletController> bullets = new List<BulletController>();
+
+        public static ControllerFactory playerFactory = new PlayerControllerFactory();
+        public static ControllerFactory robotFactory = new RobotControllerFactory();
+        public static ControllerFactory ottoFactory = new OttoControllerFactory();
+        public static ControllerFactory bulletFactory = new BulletControllerFactory();
 
         public enum EntityType
         {

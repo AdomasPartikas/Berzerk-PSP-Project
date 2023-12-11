@@ -1,4 +1,5 @@
 ﻿using Berzerk.DTOs;
+using Berzerk.Abstraction;
 using Berzerk.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,14 @@ using static Berzerk.DTOs.CharacterDTO;
 
 namespace Berzerk.Controllers
 {
-    internal class RobotController
+    public class RobotController : AbstractController
     {
-        public bool isAlive;
+        private bool _isAlive;
+        public override bool isAlive
+        {
+            get { return _isAlive; }
+            set { _isAlive = value; }
+        }
 
         public MapDTO.Entity robotEntity;
         public PictureBox robotBody;
@@ -21,7 +27,7 @@ namespace Berzerk.Controllers
         public RobotState robotState;
         public RobotType robotType;
 
-        private Direction direction;
+        public Direction direction;
         private List<Direction> listOfDirections = new List<Direction>();
         private Pathfind pathfind;
         private Panel? gamePanel;
@@ -105,7 +111,7 @@ namespace Berzerk.Controllers
                             }
                         }
 
-                        MoveRobot(direction, movementSpeed);
+                        Move(robotEntity, direction, robotBody, movementSpeed);
                     }
                     break;
                 case RobotState.Moving:
@@ -126,79 +132,10 @@ namespace Berzerk.Controllers
                         else
                             direction = (Direction)random.Next(0, 8);
 
-                        MoveRobot(direction, movementSpeed);
+                        Move(robotEntity, direction, robotBody, movementSpeed);
                     }
                     break;
             }
-        }
-
-        public void CheckRobotStatus(MapControllers map)
-        {
-            if(map.IsTouchingMap(this) == CharacterState.Dead)
-            {
-                isAlive = false;
-                robotBody.Dispose();
-                RemoveRobot();
-            }
-        }
-        private void RemoveRobot()
-        {
-            MapDTO.Map.Remove(robotEntity);
-        }
-
-        public void UpdateMap()
-        {
-            robotEntity.pictureBox = robotBody;
-            MapDTO.Map[MapDTO.Map.IndexOf(robotEntity)] = robotEntity;
-        }
-
-        public void MoveRobot(CharacterDTO.Direction direction, int movementSpeed)
-        {
-            switch (direction)
-            {
-                case Direction.Up:
-                    robotBody.Location = new System.Drawing.Point(robotBody.Location.X, robotBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.Down:
-                    robotBody.Location = new System.Drawing.Point(robotBody.Location.X, robotBody.Location.Y + movementSpeed);
-                    break;
-                case Direction.Left:
-                    robotBody.Location = new System.Drawing.Point(robotBody.Location.X - movementSpeed, robotBody.Location.Y);
-                    break;
-                case Direction.Right:
-                    robotBody.Location = new System.Drawing.Point(robotBody.Location.X + movementSpeed, robotBody.Location.Y);
-                    break;
-                case Direction.UpLeft:
-                    robotBody.Location = new System.Drawing.Point(robotBody.Location.X - movementSpeed, robotBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.UpRight:
-                    robotBody.Location = new System.Drawing.Point(robotBody.Location.X + movementSpeed, robotBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.DownLeft:
-                    robotBody.Location = new System.Drawing.Point(robotBody.Location.X - movementSpeed, robotBody.Location.Y + movementSpeed);
-                    break;
-                case Direction.DownRight:
-                    robotBody.Location = new System.Drawing.Point(robotBody.Location.X + movementSpeed, robotBody.Location.Y + movementSpeed);
-                    break;
-            }
-
-            UpdateMap();
-        }
-
-        internal void Shoot(int bulletSpeed)
-        {
-            var entity = new MapDTO.Entity();
-            entity.type = MapDTO.EntityType.EnemyBullet;
-            entity.pictureBox = new System.Windows.Forms.PictureBox();
-            entity.pictureBox.BackColor = System.Drawing.Color.DarkOrange;
-            entity.pictureBox.Location = new System.Drawing.Point(robotBody.Location.X + 15, robotBody.Location.Y + 15);
-            entity.pictureBox.Size = new System.Drawing.Size(10, 10);
-
-            var bullet = new BulletController(entity, bulletSpeed, direction);
-            MapDTO.Map.Add(entity);
-            MapDTO.bullets.Add(bullet);
-
-            gamePanel!.Controls.Add(bullet.bulletBody);
         }
     }
 }

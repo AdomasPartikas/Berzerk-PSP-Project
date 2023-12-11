@@ -11,6 +11,7 @@ using Berzerk.Controllers;
 using Berzerk.Utils;
 using Berzerk.DTOs;
 using System.Diagnostics;
+using Berzerk.Abstraction;
 using Microsoft.VisualBasic.Devices;
 using System.Windows.Input;
 
@@ -31,9 +32,9 @@ namespace Berzerk.Forms
         private bool isOttoAlive = false;
 
         private int roundCount = 0;
+        private int roundRecord = 0;
 
         Random rand = new Random();
-
 
         public Game()
         {
@@ -56,7 +57,7 @@ namespace Berzerk.Forms
 
             map = new MapControllers(this);
 
-            roundCount++;
+            UpdateRounds();
 
             GC.Collect();
 
@@ -68,11 +69,23 @@ namespace Berzerk.Forms
                 map.LoadMap();
             }
 
-            player = new PlayerController(gamePanel);
+            AbstractController playerController = MapDTO.playerFactory.CreateController(gamePanel);
+            player = (PlayerController)playerController;
+
             pathfind = new Pathfind(this);
             CreateRobots();
 
             isGameRunning = true;
+        }
+
+        private void UpdateRounds()
+        {
+            roundCount++;
+            
+            if(roundCount > roundRecord)
+                roundRecord = roundCount;
+
+            this.Text = $"Berzerk\t\tRound: {roundCount} / Record: {roundRecord}";
         }
 
         private void CreateRobots()
@@ -82,11 +95,13 @@ namespace Berzerk.Forms
                 if (entity.type == MapDTO.EntityType.Robot)
                 {
                     var robotMindset = (CharacterDTO.RobotMindset)rand.Next(0, 3);
-                    robotMindset = CharacterDTO.RobotMindset.Aggressive;
                     var robotState = (CharacterDTO.RobotState)rand.Next(0,2);
                     var robotType = (CharacterDTO.RobotType)rand.Next(0, 2);
 
-                    MapDTO.robots.Add(new RobotController(entity, robotMindset, robotState, robotType, pathfind, player, gamePanel));
+
+                    AbstractController robotController = MapDTO.robotFactory.CreateController(entity, robotMindset, robotState, robotType, pathfind, player, gamePanel);
+
+                    MapDTO.robots.Add((RobotController)robotController);
                 }
             }
         }
@@ -96,11 +111,11 @@ namespace Berzerk.Forms
             foreach (var robot in MapDTO.robots)
             {
                 robot.NextMove(movementSpeed);
-                robot.CheckRobotStatus(map);
+                robot.CheckEntityStatus(map, robot.robotEntity, robot.robotBody);
 
                 if(robot.robotState == CharacterDTO.RobotState.Attacking && rand.Next(0,100) >= 93)
                 {
-                    robot.Shoot(bulletSpeed);
+                    robot.Shoot(bulletSpeed, MapDTO.EntityType.EnemyBullet, robot.direction, robot.robotBody, gamePanel);
                 }
             }
             MapDTO.robots = MapDTO.robots.Where(robot => robot.isAlive == true).ToList();
@@ -144,8 +159,8 @@ namespace Berzerk.Forms
 
             foreach (var bullet in MapDTO.bullets)
             {
-                bullet.MoveBullet();
-                bullet.CheckBulletStatus(map);
+                bullet.Move(bullet.bulletEntity, bullet.direction, bullet.bulletBody, bullet.bulletSpeed);
+                bullet.CheckEntityStatus(map, bullet.bulletEntity, bullet.bulletBody);
             }
             MapDTO.bullets = MapDTO.bullets.Where(bullet => bullet.isAlive == true).ToList();
             if (MapDTO.bullets.Any(bullet => bullet.isAlive == false))
@@ -157,15 +172,15 @@ namespace Berzerk.Forms
         private void PlayerTurn()
         {
             player.GetRelativeCursorPosition();
-            player.MovePlayer(player.relativeCursorPosition, movementSpeed);
-            player.CheckPlayerStatus(map);
+            player.Move(player.playerEntity, player.GetRelativeCursorPosition(), player.playerBody, movementSpeed);
+            player.CheckEntityStatus(map, player.playerEntity, player.playerBody);
         }
 
         private void PlayerKeyPress(object sender, System.Windows.Forms.KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Space)
             {
-                player.Shoot(bulletSpeed);
+                player.Shoot(bulletSpeed, MapDTO.EntityType.PlayerBullet, player.GetRelativeCursorPosition(), player.playerBody, gamePanel);
             }
         }
 
@@ -174,7 +189,7 @@ namespace Berzerk.Forms
             if (!isGameRunning)
                 return;
 
-            if(player.isPlayerAlive == false)
+            if(player.isAlive == false)
             {
                 isGameRunning = false;
                 MessageBox.Show($"You died! You survived {roundCount} rounds!");

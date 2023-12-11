@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Berzerk.Controllers
 {
-    internal class MapControllers
+    public class MapControllers
     {
         public List<List<MapDTO.Entity>> listOfMaps = new List<List<MapDTO.Entity>>();
 
@@ -25,11 +25,12 @@ namespace Berzerk.Controllers
                 this.game = game ?? throw new NullReferenceException();
                 this.gamePanel = game.Controls.Find("gamePanel", true).FirstOrDefault() as Panel;
 
-                listOfMaps = new MapBuilder().CreateMaps();
+                listOfMaps = new MapBuilder(Path.GetFullPath(Environment.CurrentDirectory + "\\..\\..\\..\\Sprites\\")).CreateMaps();
             }
             catch (Exception)
             {
                 MessageBox.Show("Game panel not found", "Null Reference", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
             }
         }
 

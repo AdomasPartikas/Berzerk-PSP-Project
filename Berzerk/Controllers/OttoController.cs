@@ -1,4 +1,5 @@
 ﻿using Berzerk.DTOs;
+using Berzerk.Abstraction;
 using Berzerk.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,14 @@ using static Berzerk.DTOs.CharacterDTO;
 
 namespace Berzerk.Controllers
 {
-    internal class OttoController
+    public class OttoController : AbstractController
     {
-        public bool isAlive;
+        private bool _isAlive;
+        public override bool isAlive
+        {
+            get { return _isAlive; }
+            set { _isAlive = value; }
+        }
 
         public MapDTO.Entity ottoEntity;
         public PictureBox ottoBody;
@@ -38,7 +44,7 @@ namespace Berzerk.Controllers
 
         public void NextMove(int movementSpeed)
         {
-            if (player.isPlayerAlive)
+            if (player.isAlive)
             {
                 var playerCoordinates = new Tuple<int, int>(player.playerBody.Location.X / 10, player.playerBody.Location.Y / 10);
                 var ottoCoordinates = new Tuple<int, int>(ottoBody.Location.X / 10, ottoBody.Location.Y / 10);
@@ -59,46 +65,7 @@ namespace Berzerk.Controllers
                 direction = (CharacterDTO.Direction)random.Next(0, 8);
             }
 
-            MoveOtto(direction, movementSpeed);
-        }
-
-        public void MoveOtto(CharacterDTO.Direction direction, int movementSpeed)
-        {
-            switch (direction)
-            {
-                case Direction.Up:
-                    ottoBody.Location = new System.Drawing.Point(ottoBody.Location.X, ottoBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.Down:
-                    ottoBody.Location = new System.Drawing.Point(ottoBody.Location.X, ottoBody.Location.Y + movementSpeed);
-                    break;
-                case Direction.Left:
-                    ottoBody.Location = new System.Drawing.Point(ottoBody.Location.X - movementSpeed, ottoBody.Location.Y);
-                    break;
-                case Direction.Right:
-                    ottoBody.Location = new System.Drawing.Point(ottoBody.Location.X + movementSpeed, ottoBody.Location.Y);
-                    break;
-                case Direction.UpLeft:
-                    ottoBody.Location = new System.Drawing.Point(ottoBody.Location.X - movementSpeed, ottoBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.UpRight:
-                    ottoBody.Location = new System.Drawing.Point(ottoBody.Location.X + movementSpeed, ottoBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.DownLeft:
-                    ottoBody.Location = new System.Drawing.Point(ottoBody.Location.X - movementSpeed, ottoBody.Location.Y + movementSpeed);
-                    break;
-                case Direction.DownRight:
-                    ottoBody.Location = new System.Drawing.Point(ottoBody.Location.X + movementSpeed, ottoBody.Location.Y + movementSpeed);
-                    break;
-            }
-
-            UpdateMap();
-        }
-
-        private void UpdateMap()
-        {
-            ottoEntity.pictureBox = ottoBody;
-            MapDTO.Map[MapDTO.Map.IndexOf(ottoEntity)] = ottoEntity;
+            Move(ottoEntity ,direction, ottoBody, movementSpeed);
         }
 
         private void GenerateOtto()

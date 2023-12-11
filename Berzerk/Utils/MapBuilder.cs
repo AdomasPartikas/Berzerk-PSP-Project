@@ -9,16 +9,18 @@ using Berzerk.DTOs;
 
 namespace Berzerk.Utils
 {
-    internal class MapBuilder
+    public class MapBuilder
     {
         private bool[,] takenSpaces;
         private string[] listOfMapPaths;
         private string filePath;
 
-        public MapBuilder()
+        public MapBuilder(string directory)
         {
-            filePath = Environment.CurrentDirectory + "\\..\\..\\..\\Sprites\\";
-            listOfMapPaths = Directory.GetFiles(filePath, "map*.png");
+            if(!Path.Exists(directory))
+                throw new FileNotFoundException();
+            else
+                listOfMapPaths = Directory.GetFiles(directory, "map*.png");
         }
 
         public List<List<MapDTO.Entity>> CreateMaps()
@@ -33,9 +35,8 @@ namespace Berzerk.Utils
                 if (map.Width != MapDTO.MapWidth || map.Height != MapDTO.MapHeight)
                 {
                     var message = $"Map size of map: [{mapName}] does not match the game size";
-                    Debug.WriteLine($"[{DateTime.Now}]<Error> {message}");
-                    MessageBox.Show(message, "Map size error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    continue;
+
+                    throw new FileFormatException(message);
                 }
                 else
                 {

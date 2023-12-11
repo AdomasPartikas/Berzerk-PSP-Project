@@ -1,4 +1,5 @@
 ﻿using Berzerk.DTOs;
+using Berzerk.Abstraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,15 @@ using static Berzerk.DTOs.CharacterDTO;
 
 namespace Berzerk.Controllers
 {
-    internal class PlayerController
+    public class PlayerController : AbstractController
     {
-        public bool isPlayerAlive;
+        private bool _isAlive;
+        public override bool isAlive
+        {
+            get { return _isAlive; }
+            set { _isAlive = value; }
+        }
+
         public bool playerWon;
 
         public MapDTO.Entity playerEntity;
@@ -18,44 +25,20 @@ namespace Berzerk.Controllers
 
         private Panel? gamePanel;
 
-        public Direction relativeCursorPosition; 
-
         public PlayerController(Panel gamePanel)
         {
-            this.isPlayerAlive = true;
+            this.isAlive = true;
 
             GetPlayer();
             this.gamePanel = gamePanel;
         }
 
-        public void UpdateMap()
-        {
-            playerEntity.pictureBox = playerBody;
-            MapDTO.Map[MapDTO.Map.IndexOf(playerEntity)] = playerEntity;
-        }
-
-        public void GetRelativeCursorPosition()
+        public Direction GetRelativeCursorPosition()
         {
             var cursorPosition = System.Windows.Forms.Cursor.Position;
             var relativeCursorPositionCoordinates = playerBody.PointToClient(cursorPosition);
 
-            relativeCursorPosition = ConvertCursorCoordinatesToDirection(relativeCursorPositionCoordinates);
-        }
-
-        public void Shoot(int bulletSpeed)
-        {
-            var entity = new MapDTO.Entity();
-            entity.type = MapDTO.EntityType.PlayerBullet;
-            entity.pictureBox = new System.Windows.Forms.PictureBox();
-            entity.pictureBox.BackColor = System.Drawing.Color.DarkCyan;
-            entity.pictureBox.Location = new System.Drawing.Point(playerBody.Location.X + 15, playerBody.Location.Y + 15);
-            entity.pictureBox.Size = new System.Drawing.Size(10, 10);
-
-            var bullet = new BulletController(entity, bulletSpeed, relativeCursorPosition);
-            MapDTO.Map.Add(entity);
-            MapDTO.bullets.Add(bullet);
-
-            gamePanel!.Controls.Add(bullet.bulletBody);
+            return ConvertCursorCoordinatesToDirection(relativeCursorPositionCoordinates);
         }
 
         private Direction ConvertCursorCoordinatesToDirection(Point relativeCursorCoordinates)
@@ -112,52 +95,6 @@ namespace Berzerk.Controllers
             }
 
             playerBody = playerEntity.pictureBox;
-        }
-
-        public void CheckPlayerStatus(MapControllers map)
-        {
-            var status = map.IsTouchingMap(this);
-            if(status == CharacterDTO.CharacterState.Dead)
-            {
-                isPlayerAlive = false;
-            }
-            else if(status == CharacterDTO.CharacterState.NextLevel)
-            {
-                playerWon = true;
-            }
-        }
-
-        public void MovePlayer(Direction direction, int movementSpeed)
-        {
-            switch (direction)
-            {
-                case Direction.Up:
-                    playerBody.Location = new System.Drawing.Point(playerBody.Location.X, playerBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.Down:
-                    playerBody.Location = new System.Drawing.Point(playerBody.Location.X, playerBody.Location.Y + movementSpeed);
-                    break;
-                case Direction.Left:
-                    playerBody.Location = new System.Drawing.Point(playerBody.Location.X - movementSpeed, playerBody.Location.Y);
-                    break;
-                case Direction.Right:
-                    playerBody.Location = new System.Drawing.Point(playerBody.Location.X + movementSpeed, playerBody.Location.Y);
-                    break;
-                case Direction.UpLeft:
-                    playerBody.Location = new System.Drawing.Point(playerBody.Location.X - movementSpeed, playerBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.UpRight:
-                    playerBody.Location = new System.Drawing.Point(playerBody.Location.X + movementSpeed, playerBody.Location.Y - movementSpeed);
-                    break;
-                case Direction.DownLeft:
-                    playerBody.Location = new System.Drawing.Point(playerBody.Location.X - movementSpeed, playerBody.Location.Y + movementSpeed);
-                    break;
-                case Direction.DownRight:
-                    playerBody.Location = new System.Drawing.Point(playerBody.Location.X + movementSpeed, playerBody.Location.Y + movementSpeed);
-                    break;
-            }
-
-            UpdateMap();
         }
 
     }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Berzerk.DTOs
 {
-    internal class CharacterDTO
+    public class CharacterDTO
     {
         public enum Direction
         {

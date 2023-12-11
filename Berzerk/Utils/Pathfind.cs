@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Berzerk.Utils
 {
-    internal class Pathfind
+    public class Pathfind
     {
         private Tile[,]? map;
         private Tile[,] mapCopy;
